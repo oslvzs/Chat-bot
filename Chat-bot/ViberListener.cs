@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Chat_bot
 {
-    class ViberListener
+    class ViberListener : IChatListener
     {
+        public void ListenChat()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

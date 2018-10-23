@@ -5,3 +5,5 @@ C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csproj
 C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.exe
 C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.pdb
 C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csprojResolveAssemblyReference.cache
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\bin\Debug\Newtonsoft.Json.dll
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\bin\Debug\Newtonsoft.Json.xml

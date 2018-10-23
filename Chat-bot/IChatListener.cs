@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Chat_bot
 {
-    class TelegramListener : IChatListener
+    interface IChatListener
     {
-        public void ListenChat()
-        {
-            throw new NotImplementedException();
-        }
+        void ListenChat();
     }
 }
