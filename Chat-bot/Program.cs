@@ -10,7 +10,8 @@ namespace Chat_bot
     {
         static void Main(string[] args)
         {
-
+            MusixmatchFinder finder = new MusixmatchFinder();
+            finder.FindSongByLyrics("Pepega");
         }
     }
 }

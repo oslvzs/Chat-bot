@@ -1,0 +1,7 @@
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\bin\Debug\Chat-bot.exe.config
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\bin\Debug\Chat-bot.exe
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\bin\Debug\Chat-bot.pdb
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csproj.CoreCompileInputs.cache
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.exe
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.pdb
+C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csprojResolveAssemblyReference.cache
