@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chat_bot
 {
-    class Program
+    class TelegramListener
     {
-        static void Main(string[] args)
-        {
-
-        }
     }
 }
