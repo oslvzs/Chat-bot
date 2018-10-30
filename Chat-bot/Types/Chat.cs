@@ -1,14 +1,14 @@
-﻿using Chat_bot.Types;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chat_bot
+namespace Chat_bot.Types
 {
-    interface IChatListener
+    class Chat
     {
-        void ListenChat();
+        public int id;
+        public string type;
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Chat_bot
@@ -10,8 +11,8 @@ namespace Chat_bot
     {
         static void Main(string[] args)
         {
-            MusixmatchFinder finder = new MusixmatchFinder();
-            finder.FindSongByLyrics("Из окна гостиничного");
+            TelegramListener telegram = new TelegramListener();
+            telegram.ListenChat();
         }
     }
 }

@@ -7,3 +7,13 @@ C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.pdb
 C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csprojResolveAssemblyReference.cache
 C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\bin\Debug\Newtonsoft.Json.dll
 C:\Users\MR REZISTR\Documents\GitHub\Chat-bot\Chat-bot\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Chat-bot.exe.config
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Chat-bot.exe
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Chat-bot.pdb
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csprojResolveAssemblyReference.cache
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csproj.CoreCompileInputs.cache
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csproj.CopyComplete
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\obj\Debug\Chat-bot.exe
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\obj\Debug\Chat-bot.pdb
