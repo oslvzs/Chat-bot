@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 namespace Chat_bot
 {
-    class TelegramListener : IChatListener
+    public class TelegramListener : IChatListener
     {
 
         private readonly string token = "715661565:AAGZjW3w3WzV2M6o7MM2SxXmetH5X3yYhMA";

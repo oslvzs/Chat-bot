@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chat_bot.Types
 {
-    class User
+    public class User
     {
         public int id;
         public bool is_bot;

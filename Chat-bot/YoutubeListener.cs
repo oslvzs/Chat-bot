@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 
 namespace Chat_bot
 {
-    class YoutubeListener
+    public class YoutubeListener
     {
         public  string TryYoutube(string songName)
         {
             StringBuilder officialVideo = new StringBuilder();
             StringBuilder youtubeLink = new StringBuilder();
+            List<string> videos = new List<string>();
+            Google.Apis.YouTube.v3.Data.SearchListResponse searchListResponse;
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = "AIzaSyASNqKt_dBol98tLlQDxQuZbbUPP3S4zF4"
@@ -23,9 +25,15 @@ namespace Chat_bot
             officialVideo = officialVideo.Append(songName).Append(" (Official Music Video)");
             searchListRequest.Q = officialVideo.ToString();
             searchListRequest.MaxResults = 10;
-            //получаем ответ
-            var searchListResponse = searchListRequest.Execute();
-            List<string> videos = new List<string>();
+            //получаем ответ    
+            try
+            {
+                 searchListResponse = searchListRequest.Execute();
+            }
+            catch
+            {
+                throw new System.ArgumentException("Can't receive response");
+            }           
             // парсим его
             foreach (var searchResult in searchListResponse.Items)
             {
@@ -33,7 +41,8 @@ namespace Chat_bot
                 {
                     case "youtube#video":
                         youtubeLink.Append("https://www.youtube.com/watch?v=").Append(searchResult.Id.VideoId.ToString());
-                        videos.Add(String.Format("{0} ({1})", searchResult.Snippet.Title, youtubeLink.ToString()));
+                        videos.Add(String.Format("{0}", youtubeLink.ToString()));
+                        youtubeLink.Clear();
                         break;
                     case "youtube#channel":
                         continue;
@@ -42,7 +51,7 @@ namespace Chat_bot
                 }                              
             }
             // на месте 8)
-                return videos[0];
+            return videos[0];
         }
     }
 }

@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Chat_bot
 {
-    class MusixmatchFinder
+    public class MusixmatchFinder
     {
         //Токен и URL для обращения к сервису
         private const string musixmatchToken = "a9d4b1bbe71864653c7008ec4abf773e";
