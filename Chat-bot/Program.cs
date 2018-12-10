@@ -11,10 +11,8 @@ namespace Chat_bot
     {
         static void Main(string[] args)
         {
-            //TelegramListener telegram = new TelegramListener();
-            //telegram.ListenChat();
-            YoutubeListener ytl = new YoutubeListener();
-            ytl.TryYoutube("банька парилка");
+            TelegramListener telegram = new TelegramListener();
+            telegram.ListenChat();
         }
     }
 }

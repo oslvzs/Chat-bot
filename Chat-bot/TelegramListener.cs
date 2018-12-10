@@ -22,11 +22,13 @@ namespace Chat_bot
         public void ListenChat()
         {
             MusixmatchFinder musicFinder = new MusixmatchFinder();
+            YoutubeListener youtube = new YoutubeListener();
             int offset = GetOffset();
             string offsetString = "?offset=" + GetOffset().ToString();
             string methodUrl = baseUrl + token + "/getUpdates";
+            string topSong = "";
 
-            int requestFrequency = 3000; 
+            int requestFrequency = 1000; 
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
@@ -54,9 +56,21 @@ namespace Chat_bot
                     string text = message["message"]["text"].Value<string>();
 
                     var songResults = musicFinder.FindSongByLyrics(text);
-                    string answer = SetAnswer(chat, songResults, from);
-
-                    SendMessage(chat, answer);
+                    string answer = "";
+                    string link = "";
+                    if (songResults.Count == 0)
+                    {
+                        answer = string.Format("Hello, {0}.\nNo results. Change your request.",from);
+                        SendMessage(chat, answer);
+                    } 
+                    else 
+                    {
+                        topSong = string.Format("{0} - {1}",songResults[0].Item3, songResults[0].Item1);
+                        answer = SetAnswer(chat, songResults, from);
+                        link = string.Format("YouTube video for most relevant result:\n{0}", youtube.TryYoutube(topSong));
+                        SendMessage(chat, answer);
+                        SendMessage(chat, link);
+                    }                                 
                 }
 
                 offset = updateId + 1;
@@ -67,28 +81,15 @@ namespace Chat_bot
 
         private string SetAnswer(int chat, IList<Tuple<string, string, string>> songs, string from) 
         {
-            StringBuilder sb = new StringBuilder("Microchelik ");
+            StringBuilder sb = new StringBuilder("Hello, ");
             sb.Append(from);
-            if (songs.Count == 0)
-            {
-                sb.Append("\nRezultatov net. Pomenyai zapros ili ya xz. Zhizn pomenyai.");
-                return sb.ToString();
-            }
-            sb.Append("\nChekai: \n");
+            sb.Append(".\nPossible results are: \n");
             int counter = 0;
             foreach (var item in songs)
             {
                 counter++;
-                sb.Append(counter);
-                sb.Append(") ");
-                sb.Append(item.Item3);
-                sb.Append(" - ");
-                sb.Append(item.Item1);
-                sb.Append(" iz alboma ");
-                sb.Append(item.Item2);
-                sb.Append("\n");
+                sb.Append(string.Format("{0}) {1} - {2} (album: {3})\n", counter, item.Item3, item.Item1, item.Item2));
             }
-
 
             return sb.ToString();
         }

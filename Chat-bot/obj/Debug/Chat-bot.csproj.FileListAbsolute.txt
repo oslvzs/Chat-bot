@@ -41,3 +41,17 @@ C:\Users\тпр\Source\Repos\Chat-bot\Chat-bot\bin\Debug\Google.Apis.YouTube.v3.
 C:\Users\тпр\Source\Repos\Chat-bot\Chat-bot\bin\Debug\Google.Apis.YouTube.v3.xml
 C:\Users\тпр\Source\Repos\Chat-bot\Chat-bot\bin\Debug\Newtonsoft.Json.xml
 C:\Users\тпр\Source\Repos\Chat-bot\Chat-bot\obj\Debug\Chat-bot.csproj.CopyComplete
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.Auth.dll
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.Auth.PlatformServices.dll
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.Core.dll
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.dll
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.PlatformServices.dll
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.YouTube.v3.dll
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.pdb
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.xml
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.Auth.pdb
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.Auth.xml
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.Core.pdb
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.Core.xml
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.YouTube.v3.pdb
+C:\Users\Dmitry\Desktop\Bot\Chat-bot\Chat-bot\bin\Debug\Google.Apis.YouTube.v3.xml
