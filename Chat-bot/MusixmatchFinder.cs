@@ -19,7 +19,9 @@ namespace Chat_bot
         //Метод нахождения песни по словам в ней
         public IList<Tuple<string, string, string>> FindSongByLyrics(string lyrics)
         {
-            string answer = string.Empty; 
+
+            //Создаем список кортежей, в которых будет храниться только полезная информация: название трека, альбом и исполнитель
+            IList<Tuple<string, string, string>> songList = new List<Tuple<string, string, string>>();
 
             //Формируем строку запроса
             string finalURL = rootURL + "track.search?format=jsonp&callback=callback&q_lyrics="
@@ -29,25 +31,52 @@ namespace Chat_bot
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(finalURL);
             request.Method = "GET";
 
-            //Отправляем запрос и считываем ответ сервиса
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            string answer = string.Empty;
+            try
             {
-               answer = reader.ReadToEnd();
+                //Отправляем запрос и считываем ответ сервиса
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    answer = reader.ReadToEnd();
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("При попытке соединения с API Musixmatch что-то пошло не так!");
+                Console.WriteLine(e.Message);
+                return songList;
             }
 
-            //Преобразуем ответ в JSON-объект
-            StringBuilder JSONizedAnswer = new StringBuilder(answer);
-            JSONizedAnswer.Remove(0, 9);
-            JSONizedAnswer.Remove(JSONizedAnswer.Length-2, 2);
-            JObject answerJSON = JObject.Parse(JSONizedAnswer.ToString());
+            JObject answerJSON = new JObject();
+            try
+            {
+                //Преобразуем ответ в JSON-объект
+                StringBuilder JSONizedAnswer = new StringBuilder(answer);
+                JSONizedAnswer.Remove(0, 9);
+                JSONizedAnswer.Remove(JSONizedAnswer.Length - 2, 2);
+                answerJSON = JObject.Parse(JSONizedAnswer.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Не удалось преобразовать ответ от сервера в JSON-объект!");
+                Console.WriteLine(e.Message);
+                return songList;
+            }
 
-            //Вытаскиваем из объекта его "детей" с полезной информацией
-            List<JToken> results = answerJSON["message"]["body"]["track_list"].Children().ToList();
-
-            //Создаем список кортежей, в которых будет храниться только полезная информация: название трека, альбом и артист
-            IList<Tuple<string, string, string>> songList = new List<Tuple<string, string, string>>();
+            List<JToken> results = new List<JToken>();
+            try
+            {
+                //Вытаскиваем из объекта его "детей" с полезной информацией
+                results = answerJSON["message"]["body"]["track_list"].Children().ToList();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Не удалось расознать JSON-ответ от Musixmatch!");
+                Console.WriteLine(e.Message);
+                return songList;
+            }
 
             //Добавляем в список кортеж о каждой найденой песне, если в списке объектов меньше пяти
             foreach (JToken result in results)
@@ -57,11 +86,6 @@ namespace Chat_bot
                     Tuple<string, string, string> songInfo = new Tuple<string, string, string>(result["track"]["track_name"].ToString(), result["track"]["album_name"].ToString(), result["track"]["artist_name"].ToString());
                     songList.Add(songInfo);
                 }
-            }
-
-            foreach(Tuple<string, string, string> thing in songList)
-            {
-                Console.WriteLine(thing.Item1 + ", " + thing.Item2 + ", " + thing.Item3 + ".");
             }
 
             return songList;

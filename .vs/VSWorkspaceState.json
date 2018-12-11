@@ -1,7 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Chat-bot"
+    "\\Chat-bot",
+    "\\Chat-bot\\bin",
+    "\\Chat-bot\\bin\\Debug",
+    "\\Chat-bot\\obj",
+    "\\Chat-bot\\obj\\Debug",
+    "\\UnitTestProject1"
   ],
   "SelectedNode": "\\Chat-bot.sln",
   "PreviewInSolutionExplorer": false

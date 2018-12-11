@@ -145,7 +145,8 @@ namespace Chat_bot
             }
             catch (Exception e)
             {
-                offset = int.MinValue; ;
+                offset = int.MinValue;
+                Console.WriteLine(e.Message);
             }
             return offset;
         }
@@ -157,8 +158,9 @@ namespace Chat_bot
                 Properties.Settings.Default.Save();
                 return 1;
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 return 0;
             }          
         }
@@ -178,11 +180,13 @@ namespace Chat_bot
 
 
 
-            User bot = new User();
-            bot.id = int.Parse(result["id"].ToString());
-            bot.is_bot = bool.Parse(result["is_bot"].ToString());
-            bot.first_name = result["first_name"].ToString();
-            bot.username = result["username"].ToString();
+            User bot = new User
+            {
+                id = int.Parse(result["id"].ToString()),
+                is_bot = bool.Parse(result["is_bot"].ToString()),
+                first_name = result["first_name"].ToString(),
+                username = result["username"].ToString()
+            };
 
             return bot;
         }
