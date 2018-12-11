@@ -46,7 +46,7 @@ namespace Chat_bot
             {
                 Console.WriteLine("При попытке соединения с API Musixmatch что-то пошло не так!");
                 Console.WriteLine(e.Message);
-                return songList;
+                return null;
             }
 
             JObject answerJSON = new JObject();
@@ -62,7 +62,7 @@ namespace Chat_bot
             {
                 Console.WriteLine("Не удалось преобразовать ответ от сервера в JSON-объект!");
                 Console.WriteLine(e.Message);
-                return songList;
+                return null;
             }
 
             List<JToken> results = new List<JToken>();
@@ -75,7 +75,7 @@ namespace Chat_bot
             {
                 Console.WriteLine("Не удалось расознать JSON-ответ от Musixmatch!");
                 Console.WriteLine(e.Message);
-                return songList;
+                return null;
             }
 
             //Добавляем в список кортеж о каждой найденой песне, если в списке объектов меньше пяти

@@ -58,19 +58,27 @@ namespace Chat_bot
                     var songResults = musicFinder.FindSongByLyrics(text);
                     string answer = "";
                     string link = "";
-                    if (songResults.Count == 0)
+                    if (songResults != null)
                     {
-                        answer = string.Format("Hello, {0}.\nNo results. Change your request.",from);
-                        SendMessage(chat, answer);
-                    } 
-                    else 
+                        if (songResults.Count == 0)
+                        {
+                            answer = string.Format("Hello, {0}.\nNo results. Change your request.", from);
+                            SendMessage(chat, answer);
+                        }
+                        else
+                        {
+                            topSong = string.Format("{0} - {1}", songResults[0].Item3, songResults[0].Item1);
+                            answer = SetAnswer(chat, songResults, from);
+                            link = string.Format("YouTube video for most relevant result:\n{0}", youtube.TryYoutube(topSong));
+                            SendMessage(chat, answer);
+                            SendMessage(chat, link);
+                        }
+                    }
+                    else
                     {
-                        topSong = string.Format("{0} - {1}",songResults[0].Item3, songResults[0].Item1);
-                        answer = SetAnswer(chat, songResults, from);
-                        link = string.Format("YouTube video for most relevant result:\n{0}", youtube.TryYoutube(topSong));
+                        answer = string.Format("Hello, {0}.\nCurrently this bot is not working properly. Try again later.", from);
                         SendMessage(chat, answer);
-                        SendMessage(chat, link);
-                    }                                 
+                    }
                 }
 
                 offset = updateId + 1;
