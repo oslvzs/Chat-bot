@@ -49,12 +49,14 @@ namespace Chat_bot
             //Создаем список кортежей, в которых будет храниться только полезная информация: название трека, альбом и артист
             IList<Tuple<string, string, string>> songList = new List<Tuple<string, string, string>>();
 
-            //Добавляем в список кортеж о каждой найденой песне
+            //Добавляем в список кортеж о каждой найденой песне, если в списке объектов меньше пяти
             foreach (JToken result in results)
             {
-                Tuple<string, string, string> songInfo = new Tuple<string, string, string>(result["track"]["track_name"].ToString(), result["track"]["album_name"].ToString(), result["track"]["artist_name"].ToString());
-                songList.Add(songInfo);
-
+                if (songList.Count < 5)
+                {
+                    Tuple<string, string, string> songInfo = new Tuple<string, string, string>(result["track"]["track_name"].ToString(), result["track"]["album_name"].ToString(), result["track"]["artist_name"].ToString());
+                    songList.Add(songInfo);
+                }
             }
 
             foreach(Tuple<string, string, string> thing in songList)
