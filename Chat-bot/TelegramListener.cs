@@ -141,7 +141,7 @@ namespace Chat_bot
             int offset;
             try
             {
-                offset = int.Parse(File.ReadAllText("offset.txt"));
+                offset = Properties.Settings.Default.Offset;
             }
             catch (Exception e)
             {
@@ -153,7 +153,8 @@ namespace Chat_bot
         {
             try
             {
-                File.WriteAllText("offset.txt", offset.ToString());
+                Properties.Settings.Default.Offset = offset;
+                Properties.Settings.Default.Save();
                 return 1;
             }
             catch
