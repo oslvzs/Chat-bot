@@ -13,7 +13,7 @@ namespace Chat_bot
     public class MusixmatchFinder
     {
         //Токен и URL для обращения к сервису
-        private const string musixmatchToken = "a9d4b1bbe71864653c7008ec4abf773e";
+        private string musixmatchToken = Properties.Settings.Default.MusixmatchKey;
         private const string rootURL = "http://api.musixmatch.com/ws/1.1/";
 
         //Метод нахождения песни по словам в ней

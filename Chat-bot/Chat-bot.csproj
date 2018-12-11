@@ -91,7 +91,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="SearchTrackJSONModel.cs" />
     <Compile Include="TelegramListener.cs" />
     <Compile Include="Types\Chat.cs" />
     <Compile Include="Types\Message.cs" />

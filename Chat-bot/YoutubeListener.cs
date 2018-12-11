@@ -18,7 +18,7 @@ namespace Chat_bot
             Google.Apis.YouTube.v3.Data.SearchListResponse searchListResponse;
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = "AIzaSyASNqKt_dBol98tLlQDxQuZbbUPP3S4zF4"
+                ApiKey = Properties.Settings.Default.YoutubeKey
             });
             // заполняем запрос нужной инфой
             var searchListRequest = youtubeService.Search.List("snippet");
@@ -30,9 +30,11 @@ namespace Chat_bot
             {
                  searchListResponse = searchListRequest.Execute();
             }
-            catch
+            catch(Exception e)
             {
-                throw new System.ArgumentException("Can't receive response");
+                Console.WriteLine("При попытке соединения с API Youtube что-то пошло не так!");
+                Console.WriteLine(e.Message);
+                return null;
             }           
             // парсим его
             foreach (var searchResult in searchListResponse.Items)

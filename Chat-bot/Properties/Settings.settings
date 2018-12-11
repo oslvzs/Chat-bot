@@ -5,5 +5,14 @@
     <Setting Name="Offset" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">834456073</Value>
     </Setting>
+    <Setting Name="MusixmatchKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="YoutubeKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TelegramKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -34,5 +34,41 @@ namespace Chat_bot.Properties {
                 this["Offset"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MusixmatchKey {
+            get {
+                return ((string)(this["MusixmatchKey"]));
+            }
+            set {
+                this["MusixmatchKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string YoutubeKey {
+            get {
+                return ((string)(this["YoutubeKey"]));
+            }
+            set {
+                this["YoutubeKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TelegramKey {
+            get {
+                return ((string)(this["TelegramKey"]));
+            }
+            set {
+                this["TelegramKey"] = value;
+            }
+        }
     }
 }

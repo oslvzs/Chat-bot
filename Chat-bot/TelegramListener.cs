@@ -16,7 +16,7 @@ namespace Chat_bot
     public class TelegramListener : IChatListener
     {
 
-        private readonly string token = "715661565:AAGZjW3w3WzV2M6o7MM2SxXmetH5X3yYhMA";
+        private readonly string token = Properties.Settings.Default.TelegramKey;
         private const string baseUrl = "https://api.telegram.org/bot";
 
         public void ListenChat()
@@ -58,6 +58,7 @@ namespace Chat_bot
                     var songResults = musicFinder.FindSongByLyrics(text);
                     string answer = "";
                     string link = "";
+                    string youtubeAnswer = "";
                     if (songResults != null)
                     {
                         if (songResults.Count == 0)
@@ -69,9 +70,18 @@ namespace Chat_bot
                         {
                             topSong = string.Format("{0} - {1}", songResults[0].Item3, songResults[0].Item1);
                             answer = SetAnswer(chat, songResults, from);
-                            link = string.Format("YouTube video for most relevant result:\n{0}", youtube.TryYoutube(topSong));
+                            youtubeAnswer = youtube.TryYoutube(topSong);
                             SendMessage(chat, answer);
-                            SendMessage(chat, link);
+                            if (youtubeAnswer != null)
+                            {
+                                link = string.Format("YouTube video for most relevant result:\n{0}", youtubeAnswer);
+                                SendMessage(chat, link);
+                            }
+                            else
+                            {
+                                link = "Something is broken. Could not load video :(";
+                                SendMessage(chat, link);
+                            }
                         }
                     }
                     else
