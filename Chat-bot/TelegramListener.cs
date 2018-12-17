@@ -15,20 +15,23 @@ namespace Chat_bot
 {
     public class TelegramListener : IChatListener
     {
-
+        
         private readonly string token = Properties.Settings.Default.TelegramKey;
         private const string baseUrl = "https://api.telegram.org/bot";
-
+        
         public void ListenChat()
         {
+            //сущности для нахождения списка релевантных треков + ссылки на ютуб
             MusixmatchFinder musicFinder = new MusixmatchFinder();
             YoutubeListener youtube = new YoutubeListener();
+            //получение сдвига
             int offset = GetOffset();
             string offsetString = "?offset=" + GetOffset().ToString();
             string methodUrl = baseUrl + token + "/getUpdates";
             string topSong = "";
 
-            int requestFrequency = 1000; 
+            //частота запросов
+            int requestFrequency = 1000;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
@@ -39,26 +42,41 @@ namespace Chat_bot
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(methodUrl + offsetString);
                 request.Method = "GET";
-
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream stream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(stream);
-                string responseString = reader.ReadToEnd();
+                //получение списка непрочитанных сообщений
+                try
+                {
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    Stream stream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(stream);
+                    string responseString = reader.ReadToEnd();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Невозможно получить ответ от Телеграма");
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
 
                 int updateId = offset;
 
+                //список всех непрочитанных сообщений в джейсоне
                 JObject lastMessages = JObject.Parse(responseString);
+                //составляем ответ для каждого сообщения
                 foreach (JToken message in lastMessages["result"])
                 {
+                    //айди сообщений (апдейта), айди чата, имя пользователя и текст сообщения
                     updateId = message["update_id"].Value<int>();
                     int chat = message["message"]["chat"]["id"].Value<int>();
                     string from = message["message"]["from"]["first_name"].Value<string>();
                     string text = message["message"]["text"].Value<string>();
 
+                    //находим наиболее релевантные треки по запросуы
                     var songResults = musicFinder.FindSongByLyrics(text);
                     string answer = "";
                     string link = "";
                     string youtubeAnswer = "";
+
+                    //проверка на наличие найденных треков
                     if (songResults != null)
                     {
                         if (songResults.Count == 0)
@@ -68,10 +86,16 @@ namespace Chat_bot
                         }
                         else
                         {
+                            //fормируем строку для нахождения на ютубе вида Исполнитель - НазваниеТрека
                             topSong = string.Format("{0} - {1}", songResults[0].Item3, songResults[0].Item1);
+                            //получаем строку со списком треков
                             answer = SetAnswer(chat, songResults, from);
+                            //находим ссылку на топовый результат поиска
                             youtubeAnswer = youtube.TryYoutube(topSong);
+                            //отправляем сообщение со списком
                             SendMessage(chat, answer);
+
+                            //отправка видео или сообщения об ошибке
                             if (youtubeAnswer != null)
                             {
                                 link = string.Format("YouTube video for most relevant result:\n{0}", youtubeAnswer);
@@ -91,12 +115,14 @@ namespace Chat_bot
                     }
                 }
 
+                //обновление и сохранение оffсета
                 offset = updateId + 1;
                 SetOffset(offset);
                 offsetString = "?offset=" + GetOffset().ToString();
             }
         }
 
+        //метод для fормирования строки со списком треков для отправки
         private string SetAnswer(int chat, IList<Tuple<string, string, string>> songs, string from) 
         {
             StringBuilder sb = new StringBuilder("Hello, ");
@@ -112,6 +138,7 @@ namespace Chat_bot
             return sb.ToString();
         }
 
+        //метод для отправки сообщения
         public void SendMessage(int chat_id, string text)
         {
             string methodUrl = baseUrl + token + "/sendMessage?chat_id="+chat_id+"&text="+WebUtility.UrlEncode(text);
@@ -119,41 +146,22 @@ namespace Chat_bot
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(methodUrl);
             request.Method = "POST";
 
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            Stream stream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(stream);
-            string responseString = reader.ReadToEnd();
-
-        }
-
-        public void ListenTemp()
-        {
-            string methodUrl = baseUrl + token + "/getUpdates";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(methodUrl);
-            request.Method = "GET";
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            Stream stream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(stream);
-            string responseString = reader.ReadToEnd();
-            int updateId = GetOffset();
-
-            JObject lastMessages = JObject.Parse(responseString);
-            foreach (JToken message in lastMessages["result"])
+            try
             {
-                updateId = message["update_id"].Value<int>();
-                string from = message["message"]["from"]["first_name"].Value<string>();
-                int replyTo = message["message"]["message_id"].Value<int>();
-                string username = message["message"]["from"]["username"].Value<string>();
-                int chat = message["message"]["chat"]["id"].Value<int>();
-                string text = message["message"]["text"].Value<string>();
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                Stream stream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(stream);
+                string responseString = reader.ReadToEnd();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Невозможно отправить сообщение.");
+                Console.WriteLine(e.Message);
             }
 
-            SetOffset(updateId+1);
         }
 
-
+        //метод получения оffсета 
         private int GetOffset()
         {
             int offset;
@@ -168,6 +176,8 @@ namespace Chat_bot
             }
             return offset;
         }
+
+        //сохранение оffсета
         private int SetOffset(int offset)
         {
             try
@@ -182,21 +192,28 @@ namespace Chat_bot
                 return 0;
             }          
         }
+
+        //тестовый метод получения инfормации о боте
         public User GetMe()
         {
             string methodUrl = baseUrl + token + "/getMe";
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(methodUrl);
             request.Method = "GET";
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            Stream stream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(stream);
-            string responseString = reader.ReadToEnd();
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                Stream stream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(stream);
+                string responseString = reader.ReadToEnd();
+            }
+            catch (Exception e)
+            {                                
+                Console.WriteLine("Невозможно получить инfормацию о боте.");
+                Console.WriteLine(e.Message);
+            }            
 
             JObject botInfo = JObject.Parse(responseString);
             JToken result = botInfo["result"];
-
-
 
             User bot = new User
             {
