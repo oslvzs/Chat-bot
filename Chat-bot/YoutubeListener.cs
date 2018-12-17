@@ -10,15 +10,24 @@ namespace Chat_bot
 {
     public class YoutubeListener
     {
-        public  string TryYoutube(string songName)
+        private readonly string youtubeToken;
+
+        public YoutubeListener(string token)
         {
+            this.youtubeToken = token;
+            }
+
+
+        public string TryYoutube(string songName)
+        {
+            
             StringBuilder officialVideo = new StringBuilder();
             StringBuilder youtubeLink = new StringBuilder();
             List<string> videos = new List<string>();
             Google.Apis.YouTube.v3.Data.SearchListResponse searchListResponse;
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = Properties.Settings.Default.YoutubeKey
+                ApiKey = youtubeToken
             });
             // заполняем запрос нужной инфой
             var searchListRequest = youtubeService.Search.List("snippet");

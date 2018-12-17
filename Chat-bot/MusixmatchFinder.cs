@@ -13,8 +13,14 @@ namespace Chat_bot
     public class MusixmatchFinder
     {
         //Токен и URL для обращения к сервису
-        private string musixmatchToken = Properties.Settings.Default.MusixmatchKey;
+        private string musixmatchToken;
         private const string rootURL = "http://api.musixmatch.com/ws/1.1/";
+
+        //Конструктор класса
+        public MusixmatchFinder(string token)
+        {
+            this.musixmatchToken = token;
+        }
 
         //Метод нахождения песни по словам в ней
         public IList<Tuple<string, string, string>> FindSongByLyrics(string lyrics)
@@ -73,7 +79,7 @@ namespace Chat_bot
             }
             catch(Exception e)
             {
-                Console.WriteLine("Не удалось расознать JSON-ответ от Musixmatch!");
+                Console.WriteLine("Не удалось распознать JSON-ответ от Musixmatch!");
                 Console.WriteLine(e.Message);
                 return null;
             }

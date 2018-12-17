@@ -11,7 +11,8 @@ namespace BotTests
         [TestMethod]
         public void MusixmatchTestEnglishLang()
         {
-            MusixmatchFinder musixmatchFinder = new MusixmatchFinder();
+            string token = UnitTestProject1.Properties.Settings.Default.MusixmatchKey;
+            MusixmatchFinder musixmatchFinder = new MusixmatchFinder(token);
             var songName = "Billie Jean is not my lover";
             IList<Tuple<string, string, string>> mixmatchResult = musixmatchFinder.FindSongByLyrics(songName);
             Tuple<string, string, string> result = new Tuple<string, string, string>("Billie Jean", "Thriller", "Michael Jackson");
@@ -22,9 +23,11 @@ namespace BotTests
 
 
         [TestMethod]
-        public void MusixmatchTestRussianhLang()
-        {
-            MusixmatchFinder musixmatchFinder = new MusixmatchFinder();
+        public void MusixmatchTestRussianLang()
+        {       
+            string token = UnitTestProject1.Properties.Settings.Default.MusixmatchKey;
+            Console.WriteLine(token);
+            MusixmatchFinder musixmatchFinder = new MusixmatchFinder(token);
             var songName = "Ах эти тучи в голубом";
             IList<Tuple<string, string, string>> mixmatchResult = musixmatchFinder.FindSongByLyrics(songName);
             Tuple<string, string, string> result = new Tuple<string, string, string>("Тучи в голубом", "My Life", "Кристина Орбакайте");
@@ -34,21 +37,43 @@ namespace BotTests
         }
 
         [TestMethod]
-        public void YouTubeTestEnglishhLang()
+        public void MusixmatchTestWrongApiKey()
         {
-            YoutubeListener youtubeListener = new YoutubeListener();
+            string token = "test2www";
+            MusixmatchFinder musixmatchFinder = new MusixmatchFinder(token);
+            var songName = "Billie Jean is not my lover";
+            IList<Tuple<string, string, string>> mixmatchResult = musixmatchFinder.FindSongByLyrics(songName);
+            Assert.AreEqual(mixmatchResult, null);
+        }
+
+        [TestMethod]
+        public void YouTubeTestEnglishLang()
+        {        
+            string token = UnitTestProject1.Properties.Settings.Default.YoutubeKey;
+            YoutubeListener youtubeListener = new YoutubeListener(token);
             var songName = "Michael Jackson - Billie Jean";
             var result = youtubeListener.TryYoutube(songName);        
             Assert.AreEqual("https://www.youtube.com/watch?v=Zi_XLOBDo_Y", result);
         }
 
         [TestMethod]
-        public void YouTubeTestRussianhLang()
+        public void YouTubeTestRussianLang()
         {
-            YoutubeListener youtubeListener = new YoutubeListener();
+            string token = UnitTestProject1.Properties.Settings.Default.YoutubeKey;
+            YoutubeListener youtubeListener = new YoutubeListener(token);
             var songName = "Кристина Орбакайте - Тучи в голубом";
             var result = youtubeListener.TryYoutube(songName);
             Assert.AreEqual("https://www.youtube.com/watch?v=Xh5IP1lMjNQ", result);
+        }
+
+        [TestMethod]
+        public void YoutubeTestWrongApiKey()
+        {
+            string token = "test2www";
+            YoutubeListener youtubeListener = new YoutubeListener(token);
+            var songName = "Billie Jean is not my lover";
+            var result = youtubeListener.TryYoutube(songName);
+            Assert.AreEqual(result, null);
         }
     }
 }

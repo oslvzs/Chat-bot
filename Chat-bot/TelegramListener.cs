@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Net;
 using System.IO;
-using Chat_bot.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
@@ -16,18 +15,26 @@ namespace Chat_bot
     public class TelegramListener : IChatListener
     {
         
-        private readonly string token = Properties.Settings.Default.TelegramKey;
+        private readonly string telegramToken;
         private const string baseUrl = "https://api.telegram.org/bot";
+
+        private readonly string musixMatchToken = Properties.Settings.Default.MusixmatchKey;
+        private readonly string youtubeToken = Properties.Settings.Default.YoutubeKey;
+
+        public TelegramListener(string token)
+        {
+            this.telegramToken = token;
+        }
         
         public void ListenChat()
         {
             //сущности для нахождения списка релевантных треков + ссылки на ютуб
-            MusixmatchFinder musicFinder = new MusixmatchFinder();
-            YoutubeListener youtube = new YoutubeListener();
+            MusixmatchFinder musicFinder = new MusixmatchFinder(musixMatchToken);
+            YoutubeListener youtube = new YoutubeListener(youtubeToken);
             //получение сдвига
             int offset = GetOffset();
             string offsetString = "?offset=" + GetOffset().ToString();
-            string methodUrl = baseUrl + token + "/getUpdates";
+            string methodUrl = baseUrl + telegramToken + "/getUpdates";
             string topSong = "";
 
             //частота запросов
@@ -35,6 +42,7 @@ namespace Chat_bot
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+            string responseString;
             while (true)
             {
                 if (sw.ElapsedMilliseconds % requestFrequency != 0)
@@ -48,13 +56,13 @@ namespace Chat_bot
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                     Stream stream = response.GetResponseStream();
                     StreamReader reader = new StreamReader(stream);
-                    string responseString = reader.ReadToEnd();
+                    responseString = reader.ReadToEnd();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Невозможно получить ответ от Телеграма");
                     Console.WriteLine(e.Message);
-                    continue;
+                    break;
                 }
 
                 int updateId = offset;
@@ -141,7 +149,7 @@ namespace Chat_bot
         //метод для отправки сообщения
         public void SendMessage(int chat_id, string text)
         {
-            string methodUrl = baseUrl + token + "/sendMessage?chat_id="+chat_id+"&text="+WebUtility.UrlEncode(text);
+            string methodUrl = baseUrl + telegramToken + "/sendMessage?chat_id="+chat_id+"&text="+WebUtility.UrlEncode(text);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(methodUrl);
             request.Method = "POST";
@@ -193,37 +201,6 @@ namespace Chat_bot
             }          
         }
 
-        //тестовый метод получения инfормации о боте
-        public User GetMe()
-        {
-            string methodUrl = baseUrl + token + "/getMe";
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(methodUrl);
-            request.Method = "GET";
-            try
-            {
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream stream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(stream);
-                string responseString = reader.ReadToEnd();
-            }
-            catch (Exception e)
-            {                                
-                Console.WriteLine("Невозможно получить инfормацию о боте.");
-                Console.WriteLine(e.Message);
-            }            
 
-            JObject botInfo = JObject.Parse(responseString);
-            JToken result = botInfo["result"];
-
-            User bot = new User
-            {
-                id = int.Parse(result["id"].ToString()),
-                is_bot = bool.Parse(result["is_bot"].ToString()),
-                first_name = result["first_name"].ToString(),
-                username = result["username"].ToString()
-            };
-
-            return bot;
-        }
     }
 }

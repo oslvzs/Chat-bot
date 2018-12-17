@@ -11,7 +11,9 @@ namespace Chat_bot
     {
         static void Main(string[] args)
         {
-            TelegramListener telegram = new TelegramListener();
+            string telegramToken = Properties.Settings.Default.TelegramKey;
+
+            TelegramListener telegram = new TelegramListener(telegramToken);      
             telegram.ListenChat();
         }
     }

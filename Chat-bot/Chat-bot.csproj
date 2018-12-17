@@ -92,9 +92,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="TelegramListener.cs" />
-    <Compile Include="Types\Chat.cs" />
-    <Compile Include="Types\Message.cs" />
-    <Compile Include="Types\User.cs" />
     <Compile Include="ViberListener.cs" />
     <Compile Include="YoutubeListener.cs" />
   </ItemGroup>
