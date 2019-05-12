@@ -20,22 +20,27 @@ namespace Chat_bot
 
         private readonly string musixMatchToken = Properties.Settings.Default.MusixmatchKey;
         private readonly string youtubeToken = Properties.Settings.Default.YoutubeKey;
+        private MusixmatchFinder musicFinder;
+        private YoutubeListener youtube;
+
+        //Список пар пользователь-список_песен, чтобы запоминать их, когда пользователь сделал запрос, но еще не ответил, правильная ли песня
+        private IList<Tuple<int, IList<Tuple<string, string, string>>>> chatsSongsList = new List<Tuple<int, IList<Tuple<string, string, string>>>>();
 
         public TelegramListener(string token)
         {
             this.telegramToken = token;
+
+            //сущности для нахождения списка релевантных треков + ссылки на ютуб
+            musicFinder = new MusixmatchFinder(musixMatchToken);
+            youtube = new YoutubeListener(youtubeToken);
         }
         
         public void ListenChat()
         {
-            //сущности для нахождения списка релевантных треков + ссылки на ютуб
-            MusixmatchFinder musicFinder = new MusixmatchFinder(musixMatchToken);
-            YoutubeListener youtube = new YoutubeListener(youtubeToken);
             //получение сдвига
             int offset = GetOffset();
             string offsetString = "?offset=" + GetOffset().ToString();
             string methodUrl = baseUrl + telegramToken + "/getUpdates";
-            string topSong = "";
 
             //частота запросов
             int requestFrequency = 1000;
@@ -66,7 +71,7 @@ namespace Chat_bot
                 }
 
                 int updateId = offset;
-
+                string answer = "";
                 //список всех непрочитанных сообщений в джейсоне
                 JObject lastMessages = JObject.Parse(responseString);
                 //составляем ответ для каждого сообщения
@@ -78,51 +83,85 @@ namespace Chat_bot
                     string from = message["message"]["from"]["first_name"].Value<string>();
                     string text = message["message"]["text"].Value<string>();
 
-                    //находим наиболее релевантные треки по запросуы
-                    var songResults = musicFinder.FindSongByLyrics(text);
-                    string answer = "";
-                    string link = "";
-                    string youtubeAnswer = "";
+                    //переменные для ведения списка песен человека
+                    int chatListPosition = 0;
+                    bool isAnswerPending = false;
+                    Tuple<int, IList<Tuple<string, string, string>>> currentChatSongsList = null;
 
-                    //проверка на наличие найденных треков
-                    if (songResults != null)
+                    //находим список песен, которые были выданы человеку
+                    foreach (var chatSongsList in chatsSongsList)
                     {
-                        if (songResults.Count == 0)
+                        Console.WriteLine(chatSongsList.Item1 + ": " + chatSongsList.Item2.Count);
+                        if (chatSongsList.Item1.Equals(chat))
                         {
-                            answer = string.Format("Hello, {0}.\nNo results. Change your request.", from);
-                            SendMessage(chat, answer);
+                            isAnswerPending = true;
+                            currentChatSongsList = chatSongsList;
+                            chatListPosition = chatsSongsList.IndexOf(currentChatSongsList);
                         }
-                        else
-                        {
-                            //fормируем строку для нахождения на ютубе вида Исполнитель - НазваниеТрека
-                            topSong = string.Format("{0} - {1}", songResults[0].Item3, songResults[0].Item1);
-                            //получаем строку со списком треков
-                            answer = SetAnswer(chat, songResults, from);
-                            //находим ссылку на топовый результат поиска
-                            youtubeAnswer = youtube.TryYoutube(topSong);
-                            //отправляем сообщение со списком
-                            SendMessage(chat, answer);
+                    }
 
-                            //отправка видео или сообщения об ошибке
-                            if (youtubeAnswer != null)
+                    //Если он еще не ответил, что нашел песню
+                    if (!isAnswerPending)
+                    {
+                        //находим наиболее релевантные треки по запросуы
+                        var songResults = musicFinder.FindSongByLyrics(text);                        
+
+                        //проверка на наличие найденных треков
+                        if (songResults != null)
+                        {
+                            
+                            if (songResults.Count == 0)
                             {
-                                link = string.Format("YouTube video for most relevant result:\n{0}", youtubeAnswer);
-                                SendMessage(chat, link);
+                                //Если их нет, то отправляем пустой ответ
+                                answer = string.Format("Hello, {0}.\nNo results. Change your request.", from);
+                                SendMessage(chat, answer);
                             }
                             else
                             {
-                                link = "Something is broken. Could not load video :(";
-                                SendMessage(chat, link);
+                                //Если они есть, то формируем новый кортеж списка песен, кидаем его в общий список всех чатов и их песен, отправляем первую
+                                var formedTuple = new Tuple<int, IList<Tuple<string, string, string>>>(chat, songResults);
+                                chatsSongsList.Add(formedTuple);                             
+                                SendSongAnswer(chatsSongsList[chatsSongsList.IndexOf(formedTuple)], from);
                             }
+                        }
+                        else
+                        {
+                            answer = string.Format("Hello, {0}.\nCurrently this bot is not working properly. Try again later.", from);
+                            SendMessage(chat, answer);
                         }
                     }
                     else
                     {
-                        answer = string.Format("Hello, {0}.\nCurrently this bot is not working properly. Try again later.", from);
-                        SendMessage(chat, answer);
+                       switch (text){
+                            case "Yes":
+                                //Если это правильная песня, то выкидываем из общего списка чатов и их песен этого пользователя
+                                chatsSongsList.Remove(currentChatSongsList);
+                                SendMessage(chat, "Great! You can ask me again!");
+                                break;
+                            case "No":
+                                //Если у нас осталась в памяти хотя бы одна песня
+                                if (currentChatSongsList.Item2.Count > 1)
+                                {
+                                    //Выкидываем первую, в прошлый раз она не подошла, отправляем следующую за ней
+                                    currentChatSongsList.Item2.RemoveAt(0);
+                                    SendSongAnswer(currentChatSongsList, from);
+                                }
+                                //Иначе говорим, что ничего не нашли
+                                else
+                                {
+                                    Console.WriteLine("Wrong Answer. No more songs.");
+                                    answer = string.Format("Dear {0}!\nI can't find your song! Ask me anything else :(", from);
+                                    SendMessage(chat, answer);
+                                    chatsSongsList.Remove(currentChatSongsList);
+                                }
+                                break;
+                            default:
+                                //Если отправлен не ответ на вопрос, то просим повторить запрос
+                                SendMessage(chat, "You still haven't answered the question. Answer 'Yes' or 'No'");
+                                break;
+                        }
                     }
                 }
-
                 //обновление и сохранение оffсета
                 offset = updateId + 1;
                 SetOffset(offset);
@@ -131,18 +170,12 @@ namespace Chat_bot
         }
 
         //метод для fормирования строки со списком треков для отправки
-        private string SetAnswer(int chat, IList<Tuple<string, string, string>> songs, string from) 
+        private string SetAnswer(int chat, Tuple<string, string, string> song, string from) 
         {
             StringBuilder sb = new StringBuilder("Hello, ");
             sb.Append(from);
-            sb.Append(".\nPossible results are: \n");
-            int counter = 0;
-            foreach (var item in songs)
-            {
-                counter++;
-                sb.Append(string.Format("{0}) {1} - {2} (album: {3})\n", counter, item.Item3, item.Item1, item.Item2));
-            }
-
+            sb.Append(".\nPossible result is: \n");
+            sb.Append(string.Format("{0} - {1} (album: {2})\n", song.Item3, song.Item1, song.Item2));
             return sb.ToString();
         }
 
@@ -201,6 +234,36 @@ namespace Chat_bot
             }          
         }
 
+        //Метод для отправки сообщения с песней, ссылкой на ютуб и вопросом про правильнос
+        private void SendSongAnswer(Tuple<int, IList<Tuple<string, string, string>>> songsList, string toWhom)
+        {
+            string answer = "";
+            string link = "";
+            string youtubeAnswer = "";
+            //формируем строку для нахождения на ютубе вида Исполнитель - НазваниеТрека
+            var currentSong = string.Format("{0} - {1}", songsList.Item2[0].Item3, songsList.Item2[0].Item1);
+            //получаем строку со списком треков
+            answer = SetAnswer(songsList.Item1, songsList.Item2[0], toWhom);
+            //находим ссылку на топовый результат поиска
+            youtubeAnswer = youtube.TryYoutube(currentSong);
+            //отправляем сообщение со списком
+            SendMessage(songsList.Item1, answer);
+
+            //Если ответ ютуб-сервиса не пустой, то отправляем видео, иначе ошибку
+            if (youtubeAnswer != null)
+            {
+                link = string.Format("YouTube video for most relevant result:\n{0}", youtubeAnswer);
+                SendMessage(songsList.Item1, link);
+            }
+            else
+            {
+                link = "Something is broken. Could not load video :(";
+                SendMessage(songsList.Item1, link);
+            }          
+            answer = string.Format("Dear {0}!\nIs this the song that you searched? Answer 'Yes' or 'No'", toWhom);
+            SendMessage(songsList.Item1, answer);
+            }
+        }
 
     }
-}
+

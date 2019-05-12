@@ -31,8 +31,9 @@ namespace Chat_bot
             });
             // заполняем запрос нужной инфой
             var searchListRequest = youtubeService.Search.List("snippet");
-            officialVideo = officialVideo.Append(songName).Append(" (Official Music Video)");
-            searchListRequest.Q = officialVideo.ToString();
+            //officialVideo = officialVideo.Append(songName).Append(" (Official Music Video)"); попробуем пока без этого
+            //searchListRequest.Q = officialVideo.ToString();
+            searchListRequest.Q = songName;
             searchListRequest.MaxResults = 10;
             //получаем ответ    
             try
@@ -44,7 +45,8 @@ namespace Chat_bot
                 Console.WriteLine("При попытке соединения с API Youtube что-то пошло не так!");
                 Console.WriteLine(e.Message);
                 return null;
-            }           
+            }
+           
             // парсим его
             foreach (var searchResult in searchListResponse.Items)
             {
