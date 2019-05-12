@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 
 namespace Chat_bot
 {
@@ -11,13 +6,16 @@ namespace Chat_bot
     {
         static void Main(string[] args)
         {
-            string telegramToken = Properties.Settings.Default.TelegramKey;
             string vkToken = Properties.Settings.Default.VkKey;
+            string telegramToken = Properties.Settings.Default.TelegramKey;
 
-            //TelegramListener telegram = new TelegramListener(telegramToken);      
-            //telegram.ListenChat();
+            TelegramListener telegram = new TelegramListener(telegramToken);
             VkListener vk = new VkListener(vkToken);
-            vk.ListenChat();
+
+            Thread telegramThread = new Thread(new ThreadStart(telegram.ListenChat));
+            telegramThread.Start();
+            Thread vkThread = new Thread(new ThreadStart(vk.ListenChat));
+            vkThread.Start();
         }
     }
 }
