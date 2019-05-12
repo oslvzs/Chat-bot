@@ -12,9 +12,12 @@ namespace Chat_bot
         static void Main(string[] args)
         {
             string telegramToken = Properties.Settings.Default.TelegramKey;
+            string vkToken = Properties.Settings.Default.VkKey;
 
-            TelegramListener telegram = new TelegramListener(telegramToken);      
-            telegram.ListenChat();
+            //TelegramListener telegram = new TelegramListener(telegramToken);      
+            //telegram.ListenChat();
+            VkListener vk = new VkListener(vkToken);
+            vk.ListenChat();
         }
     }
 }
