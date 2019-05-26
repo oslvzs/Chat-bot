@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Chat_bot.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -25,6 +26,7 @@ namespace Chat_bot
         //Метод нахождения песни по словам в ней
         public IList<Tuple<string, string, string>> FindSongByLyrics(string lyrics)
         {
+            JSONFormatter formatter = new JSONFormatter();
 
             //Создаем список кортежей, в которых будет храниться только полезная информация: название трека, альбом и исполнитель
             IList<Tuple<string, string, string>> songList = new List<Tuple<string, string, string>>();
@@ -55,43 +57,15 @@ namespace Chat_bot
                 return null;
             }
 
-            JObject answerJSON = new JObject();
-            try
-            {
-                //Преобразуем ответ в JSON-объект
-                StringBuilder JSONizedAnswer = new StringBuilder(answer);
-                JSONizedAnswer.Remove(0, 9);
-                JSONizedAnswer.Remove(JSONizedAnswer.Length - 2, 2);
-                answerJSON = JObject.Parse(JSONizedAnswer.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Не удалось преобразовать ответ от сервера в JSON-объект!");
-                Console.WriteLine(e.Message);
-                return null;
-            }
 
-            List<JToken> results = new List<JToken>();
-            try
-            {
-                //Вытаскиваем из объекта его "детей" с полезной информацией
-                results = answerJSON["message"]["body"]["track_list"].Children().ToList();
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("Не удалось распознать JSON-ответ от Musixmatch!");
-                Console.WriteLine(e.Message);
+            List<Track> tracks = formatter.ParseTracks(answer, 7);
+            if (tracks == null)
                 return null;
-            }
 
-            //Добавляем в список кортеж о каждой найденой песне, если в списке объектов меньше пяти
-            foreach (JToken result in results)
+            //Добавляем в список кортеж о каждой найденой песне, если в списке объектов меньше 7
+            foreach (Track track in tracks)
             {
-                if (songList.Count < 5)
-                {
-                    Tuple<string, string, string> songInfo = new Tuple<string, string, string>(result["track"]["track_name"].ToString(), result["track"]["album_name"].ToString(), result["track"]["artist_name"].ToString());
-                    songList.Add(songInfo);
-                }
+                songList.Add(new Tuple<string, string, string>(track.name, track.album, track.performer));
             }
 
             return songList;

@@ -116,6 +116,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JSONFormatter.cs" />
+    <Compile Include="Types\TelegramMessage.cs" />
+    <Compile Include="Types\Track.cs" />
     <Compile Include="UserInteraction.cs" />
     <Compile Include="IChatListener.cs" />
     <Compile Include="MusixmatchFinder.cs" />
