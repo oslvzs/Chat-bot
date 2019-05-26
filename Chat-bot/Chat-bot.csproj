@@ -116,12 +116,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataBaseWriter.cs" />
-    <Compile Include="MusicBotDBDataSet.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MusicBotDBDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="UserInteraction.cs" />
     <Compile Include="IChatListener.cs" />
     <Compile Include="MusixmatchFinder.cs" />
