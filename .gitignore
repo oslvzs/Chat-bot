@@ -5,3 +5,5 @@ UnitTestProject1/bin
 UnitTestProject1/obj
 TestResults/
 packages/
+/Chat-bot/MusicBotDB.mdf
+/Chat-bot/MusicBotDB_log.ldf

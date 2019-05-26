@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace Chat_bot
 {
@@ -16,6 +17,11 @@ namespace Chat_bot
             telegramThread.Start();
             Thread vkThread = new Thread(new ThreadStart(vk.ListenChat));
             vkThread.Start();
+            //DataBaseWriter dbw = new DataBaseWriter();
+            //var a = dbw.gimmeSong("банька парилка");
+            //Console.WriteLine(a.Item1.ToString() + a.Item2.ToString() + a.Item3.ToString());
+            //dbw.updateRating("Дима Смагин", "Баня", "зима", "банька парилка");
+            //dbw.insertSong("Антон", "Иванов", "Пи", "аип");
         }
     }
 }
