@@ -4,6 +4,7 @@ using System.Net;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using Chat_bot.Types;
 
 namespace Chat_bot
 {
@@ -23,6 +24,8 @@ namespace Chat_bot
 
         public void ListenChat()
         {
+            JSONFormatter formatter = new JSONFormatter();
+
             //получение сдвига
             int offset = GetOffset();
             string offsetString = "?offset=" + GetOffset().ToString();
@@ -57,19 +60,19 @@ namespace Chat_bot
                 }
 
                 int updateId = offset;
-                //список всех непрочитанных сообщений в джейсоне
-                JObject lastMessages = JObject.Parse(responseString);
-                //составляем ответ для каждого сообщения
-                foreach (JToken message in lastMessages["result"])
-                {
-                    //айди сообщений (апдейта), айди чата, имя пользователя и текст сообщения
-                    updateId = message["update_id"].Value<int>();
-                    int chat = message["message"]["chat"]["id"].Value<int>();
-                    string from = message["message"]["from"]["first_name"].Value<string>();
-                    string text = message["message"]["text"].Value<string>();
 
-                    SendMessages(telegramUserInteraction.PrepareAnswer(chat, from, text));
+                //список всех непрочитанных сообщений в джейсоне
+                List<TelegramMessage> currentMessages = formatter.ParseLastMessages(responseString);
+                if (currentMessages == null)
+                    continue;
+
+
+                foreach (TelegramMessage message in currentMessages)
+                {
+                    updateId = message.updateId;
+                    SendMessages(telegramUserInteraction.PrepareAnswer(message.chat, message.senderName, message.text));
                 }
+
                 //обновление и сохранение оffсета
                 offset = updateId + 1;
                 SetOffset(offset);

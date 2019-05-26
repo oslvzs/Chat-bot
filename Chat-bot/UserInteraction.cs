@@ -82,14 +82,16 @@ namespace Chat_bot
             }
             else
             {
-                switch (text)
+                switch (text.ToLower())
                 {
-                    case "Yes":
+                    case "yes":
+                    case "y":
                         //Если это правильная песня, то выкидываем из общего списка чатов и их песен этого пользователя
                         chatsSongsList.Remove(currentChatSongsList);
                         listOfMessages.Add(new Tuple<long?, string>(chat, "Great! You can ask me again!"));
                         return listOfMessages;
-                    case "No":
+                    case "no":
+                    case "n":
                         //Если у нас осталась в памяти хотя бы одна песня
                         if (currentChatSongsList.Item2.Count > 1)
                         {
