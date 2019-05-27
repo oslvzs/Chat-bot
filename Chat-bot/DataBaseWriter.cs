@@ -5,22 +5,26 @@ using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using System.IO;
+using Chat_bot.Types;
 
 namespace Chat_bot
 {
     class DataBaseWriter
     {
-        private string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\тпр\Source\Repos\Chat-bot4\Chat-bot\MusicBotDB.mdf;Integrated Security=True";
+        private readonly string connectionString;
         private SqlConnection sqlConnection;
         private SqlDataReader sqlReader = null;
-        private int rating;
-        private int id;
-
-        //возвращает исполнителя, трек и альбом, если они есть в бд
-        public Tuple<string, string, string> gimmeSong(string stringFromSong)
+        public DataBaseWriter()
         {
-            //кортеж для возврата
-            Tuple<string, string, string> artSong = null;
+            connectionString = string.Format("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={0}\\MusicBotDB.mdf;Integrated Security=True", Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())));
+        }
+
+        //возвращает список треков (если есть в бд)
+        public List<Track> GetRelatableTracks(string stringFromSong)
+        {
+            //cписок треков для возврата
+            List<Track> trackList = new List<Track>();
             //using statment для корректной работы IDisposable объектов
             using (sqlConnection = new SqlConnection(connectionString))
             {
@@ -35,15 +39,25 @@ namespace Chat_bot
                     //выполняем её
                     sqlReader = select.ExecuteReader();
                     //считываем результат
-                    if (sqlReader.Read())
-                        return artSong = new Tuple<string, string, string>(Convert.ToString(sqlReader["Artist"]), Convert.ToString(sqlReader["SongName"]), Convert.ToString(sqlReader["Album"]));
-                    else
+                    while (sqlReader.Read())
+                    {
+                        Track currentTrack = new Track()
+                        {
+                            performer = Convert.ToString(sqlReader["Artist"]),
+                            name = Convert.ToString(sqlReader["SongName"]),
+                            album = Convert.ToString(sqlReader["Album"]),
+                        };
+                        trackList.Add(currentTrack);
+                    }
+                    if (trackList.Count == 0)
                         return null;
+                    return trackList;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Не удалось соединиться с бд!");
                     Console.WriteLine(e.Message);
+                    return null;
                 }
                 finally
                 {
@@ -53,12 +67,14 @@ namespace Chat_bot
                 }
                 //if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
                 //    sqlConnection.Close();
-                return null;
+                //return null;
             }
         }
 
-        public void updateRating(string artist, string songName, string album, string userString)
+        public void UpdateRating(string artist, string songName, string album, string userString)
         {
+            int rating = 0;
+            int id = -1;
             using (sqlConnection = new SqlConnection(connectionString))
             {
 
@@ -104,7 +120,7 @@ namespace Chat_bot
             }
         }
 
-        public void insertSong(string artist, string songName, string album, string userString)
+        public void InsertSong(string artist, string songName, string album, string userString)
         {
             using (sqlConnection = new SqlConnection(connectionString))
             {
