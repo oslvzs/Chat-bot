@@ -12,16 +12,30 @@ namespace Chat_bot
 {
     class DataBaseWriter
     {
+        private static DataBaseWriter instance;
+
+
         private readonly string connectionString;
         private SqlConnection sqlConnection;
         private SqlDataReader sqlReader = null;
-        public DataBaseWriter()
+
+        //Делаем его синглтоном
+        protected DataBaseWriter()
         {
             connectionString = string.Format("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={0}\\MusicBotDB.mdf;Integrated Security=True", Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())));
         }
 
+        public static DataBaseWriter GetInstance()
+        {
+            if (instance == null)
+            {
+                instance = new DataBaseWriter();
+            }
+            return instance;
+        }
+
         //возвращает список треков (если есть в бд)
-        public List<Track> GetRelatableTracks(string stringFromSong)
+        public IList<Track> GetRelatableTracks(string stringFromSong)
         {
             //cписок треков для возврата
             List<Track> trackList = new List<Track>();
@@ -41,12 +55,7 @@ namespace Chat_bot
                     //считываем результат
                     while (sqlReader.Read())
                     {
-                        Track currentTrack = new Track()
-                        {
-                            performer = Convert.ToString(sqlReader["Artist"]),
-                            name = Convert.ToString(sqlReader["SongName"]),
-                            album = Convert.ToString(sqlReader["Album"]),
-                        };
+                        Track currentTrack = new Track(Convert.ToString(sqlReader["SongName"]), Convert.ToString(sqlReader["Album"]), Convert.ToString(sqlReader["Artist"]));
                         trackList.Add(currentTrack);
                     }
                     if (trackList.Count == 0)

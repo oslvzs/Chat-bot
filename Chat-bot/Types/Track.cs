@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace Chat_bot.Types
 {
-    class Track
+     public class Track
     {
+        public Track(string name, string album, string performer)
+        {
+            this.name = name;
+            this.album = album;
+            this.performer = performer;
+        }
+
         public string performer { get; set; }
         public string name { get; set; }
         public string album { get; set; }

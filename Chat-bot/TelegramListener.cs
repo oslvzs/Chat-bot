@@ -69,8 +69,8 @@ namespace Chat_bot
 
                 foreach (TelegramMessage message in currentMessages)
                 {
-                    updateId = message.updateId;
-                    SendMessages(telegramUserInteraction.PrepareAnswer(message.chat, message.senderName, message.text));
+                    updateId = message.UpdateId;
+                    SendMessages(telegramUserInteraction.PrepareAnswer(message.Chat, message.SenderName, message.Text));
                 }
 
                 //обновление и сохранение оffсета

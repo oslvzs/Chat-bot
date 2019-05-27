@@ -24,12 +24,12 @@ namespace Chat_bot
         }
 
         //Метод нахождения песни по словам в ней
-        public IList<Tuple<string, string, string>> FindSongByLyrics(string lyrics)
+        public IList<Track> FindSongByLyrics(string lyrics)
         {
             JSONFormatter formatter = new JSONFormatter();
 
             //Создаем список кортежей, в которых будет храниться только полезная информация: название трека, альбом и исполнитель
-            IList<Tuple<string, string, string>> songList = new List<Tuple<string, string, string>>();
+            IList<Track> songList = new List<Track>();
 
             //Формируем строку запроса
             string finalURL = rootURL + "track.search?format=jsonp&callback=callback&q_lyrics="
@@ -65,7 +65,7 @@ namespace Chat_bot
             //Добавляем в список кортеж о каждой найденой песне, если в списке объектов меньше 7
             foreach (Track track in tracks)
             {
-                songList.Add(new Tuple<string, string, string>(track.name, track.album, track.performer));
+                songList.Add(new Track(track.Name, track.Album, track.Performer));
             }
 
             return songList;

@@ -29,10 +29,10 @@ namespace Chat_bot
             {
                 TelegramMessage currentMessage = new TelegramMessage()
                 {
-                    updateId = message["update_id"].Value<int>(),
-                    chat = message["message"]["chat"]["id"].Value<int>(),
-                    senderName = message["message"]["from"]["first_name"].Value<string>(),
-                    text = message["message"]["text"].Value<string>(),
+                    UpdateId = message["update_id"].Value<int>(),
+                    Chat = message["message"]["chat"]["id"].Value<int>(),
+                    SenderName = message["message"]["from"]["first_name"].Value<string>(),
+                    Text = message["message"]["text"].Value<string>(),
                 };
                 answer.Add(currentMessage);
             }
@@ -76,13 +76,7 @@ namespace Chat_bot
             {
                 if (answer.Count < trackCount)
                 {
-                    Track currentTrack = new Track()
-                    {
-                        performer = result["track"]["artist_name"].ToString(),
-                        name = result["track"]["track_name"].ToString(),
-                        album = result["track"]["album_name"].ToString(),
-                    };
-
+                    Track currentTrack = new Track(result["track"]["track_name"].ToString(), result["track"]["album_name"].ToString(), result["track"]["artist_name"].ToString());
                     answer.Add(currentTrack);
                 }
             }

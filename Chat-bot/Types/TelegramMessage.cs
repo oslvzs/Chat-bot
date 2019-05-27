@@ -8,10 +8,10 @@ namespace Chat_bot.Types
 {
     class TelegramMessage
     {
-        public int updateId { get; set; }
-        public int chat { get; set; }
-        public string senderName { get; set; }
-        public string text { get; set; }
+        public int UpdateId { get; set; }
+        public int Chat { get; set; }
+        public string SenderName { get; set; }
+        public string Text { get; set; }
 
     }
 }
