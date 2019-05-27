@@ -10,14 +10,14 @@ namespace Chat_bot.Types
     {
         public Track(string name, string album, string performer)
         {
-            this.name = name;
-            this.album = album;
-            this.performer = performer;
+            this.Name = name;
+            this.Album = album;
+            this.Performer = performer;
         }
 
-        public string performer { get; set; }
-        public string name { get; set; }
-        public string album { get; set; }
+        public string Performer { get; set; }
+        public string Name { get; set; }
+        public string Album { get; set; }
 
     }
 }
