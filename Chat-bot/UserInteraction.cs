@@ -17,10 +17,11 @@ namespace Chat_bot
         private DataBaseWriter dbw;
 
         //флаг для проверки, закончился ли список песен из базы
-        private bool isDBListEmpty = false;
+        private bool isDBListEmpty;
 
         //Список пар пользователь-списокпесен, чтобы запоминать их, когда пользователь сделал запрос, но еще не ответил, правильная ли песня
-        private IList<Tuple<long?, string, IList<Track>>> chatsSongsList = new List<Tuple<long?, string, IList<Track>>>();
+        //также включает в себя первый запрос пользователя и флаг поиска в БД
+        private IList<Tuple<long?, string, bool, IList<Track>>> chatsSongsList = new List<Tuple<long?, string, bool, IList<Track>>>();
 
 
         public UserInteraction()
@@ -37,10 +38,11 @@ namespace Chat_bot
         {
             listOfMessages = new List<Tuple<long?, string>>();
             string answer = "";
+            isDBListEmpty = false;
             //переменные для ведения списка песен человека
             int chatListPosition = 0;
             bool isAnswerPending = false;
-            Tuple<long?, string, IList<Track>> currentChatSongsList = null;
+            Tuple<long?, string, bool, IList<Track>> currentChatSongsList = null;
 
             //находим список песен, которые были выданы человеку
             foreach (var chatSongsList in chatsSongsList)
@@ -78,7 +80,7 @@ namespace Chat_bot
                     }
 
                     //Если они есть, то формируем новый кортеж списка песен, кидаем его в общий список всех чатов и их песен, отправляем первую
-                    SetNewChatSongList(chat, from, text, songResults);
+                    SetNewChatSongList(chat, from, text, isDBListEmpty, songResults);
                     return listOfMessages;  
                 }
                 else
@@ -90,12 +92,13 @@ namespace Chat_bot
             }
             else
             {
+                isDBListEmpty = currentChatSongsList.Item3;
                 switch (text.ToLower())
                 {
                     case "yes":
                     case "y":
-
-                        Track track = chatsSongsList[0].Item3[0];
+                        //Берем трек и либо добавляем в базу, либо увеличиваем рейтинг
+                        Track track = chatsSongsList[0].Item4[0];
                         if (isDBListEmpty)
                         {
                             dbw.InsertSong(track.Performer, track.Name, track.Album, currentChatSongsList.Item2);
@@ -112,10 +115,10 @@ namespace Chat_bot
                     case "no":
                     case "n":
                         //Если у нас осталась в памяти хотя бы одна песня
-                        if (currentChatSongsList.Item3.Count > 1)
+                        if (currentChatSongsList.Item4.Count > 1)
                         {
                             //Выкидываем первую, в прошлый раз она не подошла, отправляем следующую за ней
-                            currentChatSongsList.Item3.RemoveAt(0);
+                            currentChatSongsList.Item4.RemoveAt(0);
                             PrepareSongAnswer(currentChatSongsList, from);
                             return listOfMessages;
                         }
@@ -141,13 +144,13 @@ namespace Chat_bot
                                 }
                                 else
                                 {
-
-                                    //перенести первый запрос в новый кортеж
+                                    //перенести первый запрос и флаг (выше уже его взяли) в новый кортеж
                                     text = currentChatSongsList.Item2;
+
                                     chatsSongsList.Remove(currentChatSongsList);
 
                                     //Если они есть, то формируем новый кортеж списка песен, кидаем его в общий список всех чатов и их песен, отправляем первую
-                                    SetNewChatSongList(chat, from, text, songResults);
+                                    SetNewChatSongList(chat, from, text, isDBListEmpty, songResults);
                                     return listOfMessages;
                                 }
                             }
@@ -161,7 +164,7 @@ namespace Chat_bot
         }
 
         //Метод создания сообщения о том, что ничего не нашли
-        private void PrepareMessageWithNoResults(long? chat, string from, Tuple<long?, string, IList<Track>> currentChatSongsList)
+        private void PrepareMessageWithNoResults(long? chat, string from, Tuple<long?, string, bool, IList<Track>> currentChatSongsList)
         {
             var answer = string.Format("Dear {0}!\nI can't find your song! Ask me anything else :(", from);
             chatsSongsList.Remove(currentChatSongsList);
@@ -169,9 +172,9 @@ namespace Chat_bot
         }
 
         //Метод создания нового кортежа пользователь-список
-        private void SetNewChatSongList(long? chat, string from, string text, IList<Track> songResults)
+        private void SetNewChatSongList(long? chat, string from, string text, bool isDBEmpty, IList<Track> songResults)
         {           
-            var formedTuple = new Tuple<long?, string, IList<Track>>(chat, text, songResults);
+            var formedTuple = new Tuple<long?, string, bool, IList<Track>>(chat, text, isDBEmpty, songResults);
             chatsSongsList.Add(formedTuple);
             PrepareSongAnswer(chatsSongsList[chatsSongsList.IndexOf(formedTuple)], from);
         }
@@ -187,15 +190,15 @@ namespace Chat_bot
         }
 
         //Метод для отправки сообщения с песней, ссылкой на ютуб и вопросом про правильность
-        private void PrepareSongAnswer(Tuple<long?, string, IList<Track>> songsList, string toWhom)
+        private void PrepareSongAnswer(Tuple<long?, string, bool, IList<Track>> songsList, string toWhom)
         {
             string answerInternal = string.Empty;
             string link = "";
             string youtubeAnswer = "";
             //формируем строку для нахождения на ютубе вида Исполнитель - НазваниеТрека
-            var currentSong = string.Format("{0} - {1}", songsList.Item3[0].Performer, songsList.Item3[0].Name);
+            var currentSong = string.Format("{0} - {1}", songsList.Item4[0].Performer, songsList.Item4[0].Name);
             //получаем строку с треком
-            answerInternal = SetAnswer(songsList.Item1, songsList.Item3[0], toWhom);
+            answerInternal = SetAnswer(songsList.Item1, songsList.Item4[0], toWhom);
             //находим ссылку на топовый результат поиска
             youtubeAnswer = youtube.TryYoutube(currentSong);
             //отправляем сообщение со списком
