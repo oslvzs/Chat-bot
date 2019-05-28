@@ -99,6 +99,11 @@ namespace Chat_bot
                 isDBListEmpty = currentChatSongsList.Item3;
                 switch (text.ToLower())
                 {
+                    case "exit":
+                    case "e":
+                        chatsSongsList.Clear();
+                        listOfMessages.Add(new Tuple<long?, string>(chat, "See ya :)"));
+                        return listOfMessages;
                     case "yes":
                     case "y":
                         //Берем трек и либо добавляем в базу, либо увеличиваем рейтинг
