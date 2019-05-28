@@ -18,6 +18,7 @@ namespace Chat_bot
         private readonly string connectionString;
         private SqlConnection sqlConnection;
         private SqlDataReader sqlReader = null;
+        private static object locker = new object();
 
         //Делаем его синглтоном
         protected DataBaseWriter()
@@ -29,7 +30,11 @@ namespace Chat_bot
         {
             if (instance == null)
             {
-                instance = new DataBaseWriter();
+                lock(locker)
+                {
+                    if (instance == null)
+                        instance = new DataBaseWriter();
+                }
             }
             return instance;
         }
@@ -121,7 +126,7 @@ namespace Chat_bot
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Console.WriteLine(e.Message);
                     Console.WriteLine("Не удалось выполнить запрос!");
                 }
                 //if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
@@ -145,7 +150,7 @@ namespace Chat_bot
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Console.WriteLine(e.Message);
                     Console.WriteLine("Не удалось выполнить запрос!");
                 }
                 //if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)

@@ -12,6 +12,7 @@ namespace Chat_bot
         private MusixmatchFinder musicFinder;
         private YoutubeListener youtube;
         private IList<Tuple<long?, string>> listOfMessages;
+        private static object locker = new object();
 
         //ссылка на наш объект взаимодействия с базой
         private DataBaseWriter dbw;
@@ -58,7 +59,13 @@ namespace Chat_bot
             //Если он еще не ответил, что нашел песню
             if (!isAnswerPending)
             {
-                var songResults = dbw.GetRelatableTracks(text);
+
+                IList<Track> songResults;
+
+                lock(locker)
+                {
+                    songResults = dbw.GetRelatableTracks(text);
+                }
 
                 //проверка на наличие найденных треков
                 if (songResults == null)
@@ -73,24 +80,19 @@ namespace Chat_bot
                         listOfMessages.Add(new Tuple<long?, string>(chat, answer));
                         return listOfMessages;
                     }
-                    //если в базе их нет
+
+                    //Если их и там нет, то отправляем пустой ответ
                     if (songResults.Count == 0)
-                    {
+                    { 
                         answer = string.Format("Hello, {0}.\nNo results. Change your request.", from);
                         listOfMessages.Add(new Tuple<long?, string>(chat, answer));
                         return listOfMessages;
                     }
+                }
 
-                    //Если они есть, то формируем новый кортеж списка песен, кидаем его в общий список всех чатов и их песен, отправляем первую
-                    SetNewChatSongList(chat, from, text, isDBListEmpty, songResults);
-                    return listOfMessages;  
-                }
-                else
-                {
-                    answer = string.Format("Hello, {0}.\nCurrently this bot is not working properly. Try again later.", from);
-                    listOfMessages.Add(new Tuple<long?, string>(chat, answer));
-                    return listOfMessages;
-                }
+                //Если они есть, то формируем новый кортеж списка песен, кидаем его в общий список всех чатов и их песен, отправляем первую
+                SetNewChatSongList(chat, from, text, isDBListEmpty, songResults);
+                return listOfMessages;
             }
             else
             {
@@ -103,11 +105,17 @@ namespace Chat_bot
                         Track track = chatsSongsList[0].Item4[0];
                         if (isDBListEmpty)
                         {
-                            dbw.InsertSong(track.Performer, track.Name, track.Album, currentChatSongsList.Item2);
+                            lock (locker)
+                            {
+                                dbw.InsertSong(track.Performer, track.Name, track.Album, currentChatSongsList.Item2);
+                            }
                         }
                         else
                         {
-                            dbw.UpdateRating(track.Performer, track.Name, track.Album, currentChatSongsList.Item2);
+                            lock (locker)
+                            {
+                                dbw.UpdateRating(track.Performer, track.Name, track.Album, currentChatSongsList.Item2);
+                            }
                         }
 
                         //Если это правильная песня, то выкидываем из общего списка чатов и их песен этого пользователя
