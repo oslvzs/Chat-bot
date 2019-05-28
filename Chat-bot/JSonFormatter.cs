@@ -74,13 +74,13 @@ namespace Chat_bot
 
             foreach (JToken result in jsonChildren)
             {
-                if (answer.Count < trackCount)
-                {
-                    Track currentTrack = new Track(result["track"]["track_name"].ToString(), result["track"]["album_name"].ToString(), result["track"]["artist_name"].ToString());
-                    answer.Add(currentTrack);
-                }
+                if (answer.Count == trackCount)
+                    break;
+
+                 Track currentTrack = new Track(result["track"]["track_name"].ToString(), result["track"]["album_name"].ToString(), result["track"]["artist_name"].ToString());
+                answer.Add(currentTrack);
             }
             return answer;
         }
     }
-}
+}   

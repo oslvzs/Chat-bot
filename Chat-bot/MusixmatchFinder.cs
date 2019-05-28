@@ -65,7 +65,7 @@ namespace Chat_bot
             //Добавляем в список кортеж о каждой найденой песне, если в списке объектов меньше 7
             foreach (Track track in tracks)
             {
-                songList.Add(new Track(track.Name, track.Album, track.Performer));
+                songList.Add(track);
             }
 
             return songList;

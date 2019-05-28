@@ -61,22 +61,24 @@ namespace Chat_bot
                 var songResults = dbw.GetRelatableTracks(text);
 
                 //проверка на наличие найденных треков
-                if (songResults != null)
+                if (songResults == null)
                 {
+                    //находим наиболее релевантные треки по запросу в сервисе
+                    songResults = musicFinder.FindSongByLyrics(text);
+                    isDBListEmpty = true;
+
+                    if (songResults == null)
+                    {
+                        answer = string.Format("Hello, {0}.\nCurrently this bot is not working properly. Try again later.", from);
+                        listOfMessages.Add(new Tuple<long?, string>(chat, answer));
+                        return listOfMessages;
+                    }
                     //если в базе их нет
                     if (songResults.Count == 0)
                     {
-                        //находим наиболее релевантные треки по запросу в сервисе
-                        songResults = musicFinder.FindSongByLyrics(text);
-                        isDBListEmpty = true;
-
-                        //Если их и там нет, то отправляем пустой ответ
-                        if (songResults.Count == 0)
-                        { 
-                            answer = string.Format("Hello, {0}.\nNo results. Change your request.", from);
-                            listOfMessages.Add(new Tuple<long?, string>(chat, answer));
-                            return listOfMessages;
-                        }
+                        answer = string.Format("Hello, {0}.\nNo results. Change your request.", from);
+                        listOfMessages.Add(new Tuple<long?, string>(chat, answer));
+                        return listOfMessages;
                     }
 
                     //Если они есть, то формируем новый кортеж списка песен, кидаем его в общий список всех чатов и их песен, отправляем первую
